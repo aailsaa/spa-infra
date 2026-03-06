@@ -7,8 +7,10 @@ ECR_REPO=$ECR_REPO
 
 echo "Logging into ECR..."
 
+REGISTRY=$(echo $ECR_REPO | cut -d'/' -f1)
+
 aws ecr get-login-password --region $AWS_REGION \
-| docker login --username AWS --password-stdin $ECR_REPO
+| docker login --username AWS --password-stdin $REGISTRY
 
 echo "Tagging image..."
 
