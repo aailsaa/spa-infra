@@ -33,6 +33,11 @@ jobs:
           bash scripts/build-image.sh
 
       - name: Run smoke tests
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           bash scripts/smoke-test.sh
 
