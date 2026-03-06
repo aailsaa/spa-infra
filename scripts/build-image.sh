@@ -1,9 +1,8 @@
 #!/bin/bash
-
 set -e
 
-echo "Building Docker image..."
+echo "Building backend image..."
+docker build -t spa-backend ./spa-app/appointment-scheduler
 
-cd spa-app
-
-docker build -t spa-app:latest .
+echo "Building frontend image..."
+docker build -t spa-frontend ./spa-app/appointment-scheduler-frontend

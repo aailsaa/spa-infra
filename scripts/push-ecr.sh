@@ -12,8 +12,12 @@ aws ecr get-login-password --region $AWS_REGION \
 
 echo "Tagging image..."
 
-docker tag spa-app:latest $ECR_REPO:latest
+docker tag spa-backend $ECR_REPO_BACKEND:latest
+docker tag spa-frontend $ECR_REPO_FRONTEND:latest
 
 echo "Pushing image..."
 
-docker push $ECR_REPO:latest
+docker push $ECR_REPO_BACKEND:latest
+docker push $ECR_REPO_FRONTEND:latest
+
+

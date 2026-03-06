@@ -1,16 +1,13 @@
 #!/bin/bash
-
 set -e
 
-echo "Running smoke tests..."
+docker run -d -p 8080:8080 --name backend spa-backend
+docker run -d -p 3000:3000 --name frontend spa-frontend
 
-docker run -d -p 5000:5000 --name test-container spa-app:latest
+sleep 20
 
-sleep 10
+curl http://localhost:8080 || exit 1
+curl http://localhost:3000 || exit 1
 
-curl http://localhost:5000 || exit 1
-
-docker stop test-container
-docker rm test-container
-
-echo "Smoke test passed!"
+docker stop backend frontend
+docker rm backend frontend
