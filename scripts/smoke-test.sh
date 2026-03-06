@@ -1,9 +1,11 @@
 #!/bin/bash
+set -e
 
-echo "Starting containers..."
+echo "Starting application with docker compose..."
 
-docker run -d -p 8080:8080 spa-backend
-docker run -d -p 3000:3000 spa-frontend
+cd spa-app
+
+docker compose up -d --build
 
 echo "Waiting for backend to start..."
 
@@ -19,3 +21,11 @@ done
 echo "Running smoke test..."
 
 curl http://localhost:8080
+
+echo "Containers running:"
+docker ps
+
+echo "Backend logs:"
+docker compose logs backend
+
+docker compose down
