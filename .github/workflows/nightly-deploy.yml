@@ -19,7 +19,7 @@ jobs:
           git clone https://github.com/aailsaa/spa-app.git
       - name: Show directory structure
         run: |
-    	  ls -la
+          ls -la
           ls -la spa-app
       - name: Configure AWS
         run: |
