@@ -16,7 +16,7 @@ jobs:
 
       - name: Clone application repo
         run: |
-          git clone https://github.com/YOUR_USERNAME/spa-app.git
+          git clone https://github.com/aailsaa/spa-app.git
 
       - name: Configure AWS
         run: |
