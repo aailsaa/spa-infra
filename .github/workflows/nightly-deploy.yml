@@ -1,0 +1,42 @@
+name: Nightly Deployment
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout infra repo
+        uses: actions/checkout@v3
+
+      - name: Clone application repo
+        run: |
+          git clone https://github.com/YOUR_USERNAME/spa-app.git
+
+      - name: Configure AWS
+        run: |
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}
+          export AWS_REGION=${{ secrets.AWS_REGION }}
+
+      - name: Build Docker image
+        run: |
+          bash scripts/build-image.sh
+
+      - name: Run smoke tests
+        run: |
+          bash scripts/smoke-test.sh
+
+      - name: Push image to ECR
+        run: |
+          bash scripts/push-ecr.sh
+
+      - name: Deploy to QA EC2
+        run: |
+          bash scripts/deploy-qa.sh
