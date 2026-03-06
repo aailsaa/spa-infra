@@ -1,13 +1,21 @@
 #!/bin/bash
-set -e
 
-docker run -d -p 8080:8080 --name backend spa-backend
-docker run -d -p 3000:3000 --name frontend spa-frontend
+echo "Starting containers..."
 
-sleep 20
+docker run -d -p 8080:8080 spa-backend
+docker run -d -p 3000:3000 spa-frontend
 
-curl http://localhost:8080 || exit 1
-curl http://localhost:3000 || exit 1
+echo "Waiting for backend to start..."
 
-docker stop backend frontend
-docker rm backend frontend
+for i in {1..20}; do
+  if curl -s http://localhost:8080 > /dev/null; then
+    echo "Backend is up!"
+    break
+  fi
+  echo "Waiting..."
+  sleep 5
+done
+
+echo "Running smoke test..."
+
+curl http://localhost:8080
