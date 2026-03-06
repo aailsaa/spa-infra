@@ -1,31 +1,16 @@
 #!/bin/bash
-set -e
 
-echo "Starting application with docker compose..."
-
-cd spa-app
-
-docker compose up -d --build
-
-echo "Waiting for backend to start..."
+echo "Running smoke test against EC2..."
 
 for i in {1..20}; do
-  if curl -s http://localhost:8080 > /dev/null; then
+  if curl -s http://$EC2_IP:8080 > /dev/null; then
     echo "Backend is up!"
-    break
+    exit 0
   fi
+
   echo "Waiting..."
   sleep 5
 done
 
-echo "Running smoke test..."
-
-curl http://localhost:8080
-
-echo "Containers running:"
-docker ps
-
-echo "Backend logs:"
-docker compose logs backend
-
-docker compose down
+echo "Smoke test failed"
+exit 1
