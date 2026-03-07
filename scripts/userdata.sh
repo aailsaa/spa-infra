@@ -4,10 +4,8 @@ yum update -y
 
 # Install Docker
 yum install -y docker
-
 systemctl start docker
 systemctl enable docker
-
 usermod -aG docker ec2-user
 
 # Install Docker Compose
@@ -16,6 +14,6 @@ curl -L https://github.com/docker/compose/releases/download/v2.27.0/docker-compo
 
 chmod +x /usr/local/bin/docker-compose
 
-# Verify installation
-docker --version
-/usr/local/bin/docker-compose --version
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+sudo docker-compose --version
