@@ -71,8 +71,10 @@ jobs:
    # Set up ssh 
     - name: Setup SSH key
       run: |
-        echo "${{ secrets.EC2_PRIVATE_KEY }}" > ec2-key.pem
-        chmod 400 ec2-key.pem
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.QA_SERVER }} >> ~/.ssh/known_hosts
 
    # Wait for EC2
     - name: Wait for EC2 Initialization
