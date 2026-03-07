@@ -93,7 +93,7 @@ jobs:
         docker load < backend.tar
         docker load < frontend.tar
 
-        docker compose up -d
+        docker-compose up -d
 
         EOF
 
