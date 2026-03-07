@@ -88,12 +88,12 @@ jobs:
 
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
 
-        sudo docker-compose up -d
+        sudo docker compose up -d
 
         sudo docker ps
         sudo docker images
-        sudo docker-compose ps
-        sudo docker-compose logs --tail=50
+        sudo docker compose ps
+        sudo docker compose logs --tail=50
         curl localhost:8080 || echo "Backend not responding yet"
 
         EOF
