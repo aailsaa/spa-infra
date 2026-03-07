@@ -78,6 +78,17 @@ jobs:
    # Wait for EC2
     - name: Wait for EC2 Initialization
       run: |
+        echo "Waiting for EC2 SSH..."
+
+        for i in {1..30}; do
+          if ssh -i ec2-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo connected"; then
+            echo "EC2 is ready"
+            break
+          fi
+          echo "Waiting for SSH..."
+          sleep 10
+        done
+        
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP \
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo waiting...; sleep 5; done"
 
