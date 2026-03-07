@@ -97,6 +97,8 @@ jobs:
         scp -i ec2-key.pem -o StrictHostKeyChecking=no spa-app/docker-compose.deploy.yml ec2-user@$EC2_IP:docker-compose.yml
 
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << EOF
+
+        cat <<ENV > .env
         export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
         export DB_URL=${{ secrets.DB_URL }}
         export DB_USER=${{ secrets.DB_USER }}
