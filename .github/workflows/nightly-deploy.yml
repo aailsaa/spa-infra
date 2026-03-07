@@ -78,11 +78,9 @@ jobs:
     # Transfer images
     - name: Run containers on EC2
       run: |
-        docker save spa-backend | gzip > backend.tar.gz
-        docker save spa-frontend | gzip > frontend.tar.gz
-
-        scp -i ec2-key.pem -o StrictHostKeyChecking=no backend.tar.gz ec2-user@$EC2_IP:~
-        scp -i ec2-key.pem -o StrictHostKeyChecking=no frontend.tar.gz ec2-user@$EC2_IP:~
+        docker save spa-backend | ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP "docker load"
+        docker save spa-frontend | ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP "docker load"
+        
         scp -i ec2-key.pem -o StrictHostKeyChecking=no spa-app/docker-compose.deploy.yml ec2-user@$EC2_IP:docker-compose.yml
 
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
@@ -94,6 +92,12 @@ jobs:
         docker load < frontend.tar
 
         docker-compose up -d
+
+        docker ps
+        docker images
+        docker-compose ps
+        docker-compose logs --tail=50
+        curl localhost:8080 || echo "Backend not responding yet"
 
         EOF
 
