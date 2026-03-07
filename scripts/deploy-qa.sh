@@ -9,6 +9,9 @@ echo "Deploying SPA to QA EC2: $QA_SERVER"
 
 ssh -vvv -T -o StrictHostKeyChecking=no ec2-user@$QA_SERVER << EOF
 
+aws ecr get-login-password --region us-east-1 \
+| docker login --username AWS --password-stdin $ECR_REPO
+
 echo "Pulling latest images from ECR..."
 
 docker pull $ECR_REPO:frontend
