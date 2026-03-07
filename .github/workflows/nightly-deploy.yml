@@ -65,9 +65,6 @@ jobs:
 
         echo "Temporary EC2 IP: $EC2_IP"
 
-        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP \
-        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo waiting...; sleep 5; done"
-
    # Set up ssh 
     - name: Setup SSH key
       run: |
@@ -77,6 +74,12 @@ jobs:
         export DB_URL=${{ secrets.DB_URL }}
         export DB_USER=${{ secrets.DB_USER }}
         export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+
+   # Wait for EC2
+    - name: Wait for EC2 Initialization
+      run: |
+        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP \
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo waiting...; sleep 5; done"
 
     # Transfer images
     - name: Run containers on EC2
