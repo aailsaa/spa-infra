@@ -42,6 +42,8 @@ docker run -d \
 --name frontend \
 $ECR_REPO:frontend
 
+curl localhost:80
+
 echo "QA deployment complete."
 
 EOF
