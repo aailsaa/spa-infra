@@ -25,11 +25,6 @@ jobs:
       run: |
         git clone https://github.com/aailsaa/spa-app.git
 
-    - name: Show directory structure
-      run: |
-        ls -la
-        ls -la spa-app
-
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
