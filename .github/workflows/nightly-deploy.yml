@@ -7,8 +7,7 @@ on:
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
-  ECR_REPO_BACKEND: ${{ secrets.ECR_REPO_BACKEND }}
-  ECR_REPO_FRONTEND: ${{ secrets.ECR_REPO_FRONTEND }}
+  ECR_REPO: ${{ secrets.ECR_REPO }}
   EC2_SECURITY_GROUP: ${{ secrets.EC2_SECURITY_GROUP }}
   EC2_SUBNET: ${{ secrets.EC2_SUBNET }}
   EC2_KEY_NAME: ${{ secrets.EC2_KEY_NAME }}
@@ -39,14 +38,12 @@ jobs:
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    # Build Docker Images
-
+    # Build images
     - name: Build Docker images
       run: |
         bash scripts/build-image.sh
 
-    # Create temporary EC2 for testing
-
+    # Launch temporary EC2
     - name: Launch temporary EC2
       run: |
         INSTANCE_ID=$(aws ec2 run-instances \
@@ -60,8 +57,6 @@ jobs:
 
         echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
-        echo "Waiting for instance..."
-
         aws ec2 wait instance-running --instance-ids $INSTANCE_ID
 
         EC2_IP=$(aws ec2 describe-instances \
@@ -73,21 +68,30 @@ jobs:
 
         echo "Temporary EC2 IP: $EC2_IP"
 
-    # Install Docker on EC2
-
+    # Install docker
     - name: Install Docker on EC2
-      run: |
-        sleep 30
+      echo "Waiting for SSH to become available..."
 
-        ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
-        sudo yum update -y
-        sudo yum install -y docker
-        sudo systemctl start docker
-        sudo systemctl enable docker
-        EOF
+      for i in {1..30}; do
+        if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo SSH ready" 2>/dev/null; then
+          echo "SSH is ready!"
+          break
+        fi
 
-    # Copy and run containers on EC2
+        echo "Waiting for SSH..."
+        sleep 10
+      done
 
+      echo "Installing Docker..."
+
+      ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
+      sudo yum update -y
+      sudo yum install -y docker
+      sudo systemctl start docker
+      sudo systemctl enable docker
+      EOF
+
+    # Transfer images
     - name: Run containers on EC2
       run: |
         docker save spa-backend | gzip > backend.tar.gz
@@ -108,10 +112,8 @@ jobs:
         EOF
 
     # Smoke test
-
     - name: Smoke test
       run: |
-
         echo "Waiting for backend..."
 
         for i in {1..20}; do
@@ -119,28 +121,26 @@ jobs:
             echo "Backend is up!"
             break
           fi
-
           echo "Waiting..."
           sleep 5
         done
 
         curl http://$EC2_IP:8080
 
-    # Destroy temporary EC2
-
+    # Terminate temp EC2
     - name: Terminate temporary EC2
       if: always()
       run: |
-        aws ec2 terminate-instances --instance-ids $INSTANCE_ID
+        if [ -n "$INSTANCE_ID" ]; then
+          aws ec2 terminate-instances --instance-ids $INSTANCE_ID
+        fi
 
     # Push images to ECR
-
     - name: Push images to ECR
       run: |
         bash scripts/push-ecr.sh
 
-    # Deploy to QA EC2
-
+    # Deploy to QA
     - name: Deploy to QA EC2
       run: |
         bash scripts/deploy-qa.sh
