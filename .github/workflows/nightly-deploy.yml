@@ -65,8 +65,8 @@ jobs:
 
         echo "Temporary EC2 IP: $EC2_IP"
 
-        echo "Waiting for EC2 initialization..."
-        sleep 60
+        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP \
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo waiting...; sleep 5; done"
 
    # Set up ssh 
     - name: Setup SSH key
