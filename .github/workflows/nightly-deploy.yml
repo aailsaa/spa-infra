@@ -125,7 +125,9 @@ jobs:
     # smoke test
     - name: Smoke test
       run: |
-        bash scripts/smoke-test.sh $EC2_IP
+        bash scripts/smoke-test.sh
+      env:
+        EC2_IP: ${{env.EC2_IP}}
 
     # Terminate temp EC2
     - name: Terminate temporary EC2
