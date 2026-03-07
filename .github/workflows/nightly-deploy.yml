@@ -65,6 +65,9 @@ jobs:
 
         echo "Temporary EC2 IP: $EC2_IP"
 
+        echo "Waiting for EC2 initialization..."
+        sleep 60
+
    # Set up ssh 
     - name: Setup SSH key
       run: |
@@ -84,12 +87,6 @@ jobs:
         scp -i ec2-key.pem -o StrictHostKeyChecking=no spa-app/docker-compose.deploy.yml ec2-user@$EC2_IP:docker-compose.yml
 
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
-
-        gunzip backend.tar.gz
-        gunzip frontend.tar.gz
-
-        sudo docker load < backend.tar
-        sudo docker load < frontend.tar
 
         sudo docker-compose up -d
 
