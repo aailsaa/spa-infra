@@ -83,7 +83,7 @@ jobs:
 
         scp -i ec2-key.pem -o StrictHostKeyChecking=no backend.tar.gz ec2-user@$EC2_IP:~
         scp -i ec2-key.pem -o StrictHostKeyChecking=no frontend.tar.gz ec2-user@$EC2_IP:~
-        scp -i ec2-key.pem -o StrictHostKeyChecking=no docker-compose.yml ec2-user@$EC2_IP:~
+        scp -i ec2-key.pem -o StrictHostKeyChecking=no spa-app/docker-compose.deploy.yml ec2-user@$EC2_IP:docker-compose.yml
 
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
 
