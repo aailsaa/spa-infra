@@ -27,19 +27,19 @@ docker rm backend || true
 
 echo "Starting backend..."
 
-docker run -d 
--p 5000:8080 
---name backend 
--e DB_URL="$DB_URL" 
--e DB_USERNAME="$DB_USERNAME" 
--e DB_PASSWORD="$DB_PASSWORD" 
+docker run -d \
+-p 5000:8080 \
+--name backend \
+-e DB_URL="$DB_URL" \
+-e DB_USERNAME="$DB_USERNAME" \
+-e DB_PASSWORD="$DB_PASSWORD" \
 $ECR_REPO:backend
 
 echo "Starting frontend..."
 
-docker run -d 
--p 80:80 
---name frontend 
+docker run -d \
+-p 80:80 \
+--name frontend \ 
 $ECR_REPO:frontend
 
 echo "QA deployment complete."
