@@ -108,7 +108,7 @@ jobs:
         sudo docker images
         sudo docker-compose ps
         sudo docker-compose logs --tail=50
-        curl localhost:8080 || echo "Backend not responding yet"
+        curl http://$EC2_IP:8080 || echo "Backend not responding yet"
 
         EOF
 
