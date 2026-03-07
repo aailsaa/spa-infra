@@ -118,17 +118,25 @@ jobs:
 
         EOF
 
-    # Smoke test
+   
     - name: Smoke test
       run: |
         echo "Waiting for backend..."
 
         for i in {1..30}; do
-          if curl --fail -s http://$EC2_IP:8080/actuator/health > /dev/null; then
+          STATUS=$(curl -s -o /dev/null \
+            --connect-timeout 5 \
+            --max-time 5 \
+            -w "%{http_code}" \
+            http://$EC2_IP:8080/actuator/health || true)
+
+          echo "Attempt $i → HTTP $STATUS"
+
+          if [ "$STATUS" = "200" ]; then
             echo "Backend is up!"
             exit 0
           fi
-          echo "Waiting..."
+
           sleep 5
         done
 
