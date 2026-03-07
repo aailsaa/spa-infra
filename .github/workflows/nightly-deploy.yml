@@ -70,26 +70,27 @@ jobs:
 
     # Install docker
     - name: Install Docker on EC2
-      echo "Waiting for SSH to become available..."
+      run: |
+        echo "Waiting for SSH to become available..."
 
-      for i in {1..30}; do
-        if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo SSH ready" 2>/dev/null; then
-          echo "SSH is ready!"
-          break
-        fi
+        for i in {1..30}; do
+          if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo SSH ready" 2>/dev/null; then
+            echo "SSH is ready!"
+            break
+          fi
 
-        echo "Waiting for SSH..."
-        sleep 10
-      done
+          echo "Waiting for SSH..."
+          sleep 10
+        done
 
-      echo "Installing Docker..."
+        echo "Installing Docker..."
 
-      ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
-      sudo yum update -y
-      sudo yum install -y docker
-      sudo systemctl start docker
-      sudo systemctl enable docker
-      EOF
+        ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
+        sudo yum update -y
+        sudo yum install -y docker
+        sudo systemctl start docker
+        sudo systemctl enable docker
+        EOF
 
     # Transfer images
     - name: Run containers on EC2
