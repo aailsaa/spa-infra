@@ -1,11 +1,10 @@
 #!/bin/bash
 
 EC2_IP=$1
-KEY=ec2-key.pem
 
 echo "Running smoke test on EC2..."
 
-ssh -i $KEY -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
+ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
 
 echo "Waiting for backend..."
 sleep 20
