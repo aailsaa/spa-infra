@@ -70,14 +70,21 @@ jobs:
       run: |
         echo "${{ secrets.EC2_PRIVATE_KEY }}" > ec2-key.pem
         chmod 400 ec2-key.pem
-        export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-        export DB_URL=${{ secrets.DB_URL }}
-        export DB_USER=${{ secrets.DB_USER }}
-        export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
 
    # Wait for EC2
     - name: Wait for EC2 Initialization
       run: |
+        echo "Waiting for EC2..."
+
+        for i in {1..30}; do
+          if ssh -i ec2-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo connected"; then
+            echo "EC2 is ready"
+            break
+          fi
+          echo "Waiting for SSH..."
+          sleep 10
+        done
+        
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP \
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo waiting...; sleep 5; done"
 
@@ -89,12 +96,20 @@ jobs:
         
         scp -i ec2-key.pem -o StrictHostKeyChecking=no spa-app/docker-compose.deploy.yml ec2-user@$EC2_IP:docker-compose.yml
 
-        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
+        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << EOF
 
-        sudo docker compose up -d
+        cat <<ENV > .env
+        export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+        export DB_URL=${{ secrets.DB_URL }}
+        export DB_USER=${{ secrets.DB_USER }}
+        export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        ENV
+
+        sudo docker-compose up -d
 
         sudo docker ps
         sudo docker images
+
         sudo docker compose ps
         sudo docker compose logs --tail=50
         sudo docker compose logs backend
