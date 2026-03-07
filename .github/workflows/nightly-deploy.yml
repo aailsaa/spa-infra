@@ -68,13 +68,19 @@ jobs:
 
         echo "Temporary EC2 IP: $EC2_IP"
 
+   # Set up ssh 
+    - name: Setup SSH key
+      run: |
+        echo "${{ secrets.EC2_SSH_KEY }}" > ec2-key.pem
+        chmod 400 ec2-key.pem
+
     # Install docker
     - name: Install Docker on EC2
       run: |
         echo "Waiting for SSH to become available..."
 
         for i in {1..30}; do
-          if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo SSH ready" 2>/dev/null; then
+          if ssh -i ec2-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo SSH ready" 2>/dev/null; then
             echo "SSH is ready!"
             break
           fi
@@ -85,7 +91,7 @@ jobs:
 
         echo "Installing Docker..."
 
-        ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
+        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
         sudo yum update -y
         sudo yum install -y docker
         sudo systemctl start docker
@@ -98,10 +104,10 @@ jobs:
         docker save spa-backend | gzip > backend.tar.gz
         docker save spa-frontend | gzip > frontend.tar.gz
 
-        scp -o StrictHostKeyChecking=no backend.tar.gz ec2-user@$EC2_IP:~
-        scp -o StrictHostKeyChecking=no frontend.tar.gz ec2-user@$EC2_IP:~
+        scp -i ec2-key.pem -o StrictHostKeyChecking=no backend.tar.gz ec2-user@$EC2_IP:~
+        scp -i ec2-key.pem -o StrictHostKeyChecking=no frontend.tar.gz ec2-user@$EC2_IP:~
 
-        ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
+        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
         gunzip backend.tar.gz
         gunzip frontend.tar.gz
 
