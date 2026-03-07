@@ -2,7 +2,7 @@
 
 echo "Running smoke test on EC2..."
 
-ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
+ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << EOF
 
 echo "Waiting for backend..."
 sleep 20
