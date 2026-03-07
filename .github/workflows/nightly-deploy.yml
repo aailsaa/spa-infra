@@ -48,6 +48,7 @@ jobs:
           --subnet-id $EC2_SUBNET \
           --associate-public-ip-address \
           --key-name $EC2_KEY_NAME \
+          --user-data file://scripts/userdata.sh
           --query 'Instances[0].InstanceId' \
           --output text)
 
@@ -69,30 +70,6 @@ jobs:
       run: |
         echo "${{ secrets.EC2_PRIVATE_KEY }}" > ec2-key.pem
         chmod 400 ec2-key.pem
-
-    # Install docker
-    - name: Install Docker on EC2
-      run: |
-        echo "Waiting for SSH to become available..."
-
-        for i in {1..30}; do
-          if ssh -i ec2-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo SSH ready" 2>/dev/null; then
-            echo "SSH is ready!"
-            break
-          fi
-
-          echo "Waiting for SSH..."
-          sleep 10
-        done
-
-        echo "Installing Docker..."
-
-        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
-        sudo yum update -y
-        sudo yum install -y docker
-        sudo systemctl start docker
-        sudo systemctl enable docker
-        EOF
 
     # Transfer images
     - name: Run containers on EC2
