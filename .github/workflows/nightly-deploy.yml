@@ -103,6 +103,7 @@ jobs:
         export DB_URL=${{ secrets.DB_URL }}
         export DB_USER=${{ secrets.DB_USER }}
         export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        ENV
 
         sudo docker-compose up -d
 
