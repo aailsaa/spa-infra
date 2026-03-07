@@ -118,7 +118,6 @@ jobs:
 
         sudo docker logs ec2-user-backend-1 --tail 50
         sudo docker logs ec2-user-frontend-1 --tail 50
-        sudo docker logs ec2-user-mysql-1 --tail 50
 
         EOF
 
