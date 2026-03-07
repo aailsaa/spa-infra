@@ -48,7 +48,7 @@ jobs:
           --subnet-id $EC2_SUBNET \
           --associate-public-ip-address \
           --key-name $EC2_KEY_NAME \
-          --user-data file://scripts/userdata.sh
+          --user-data file://scripts/userdata.sh \
           --query 'Instances[0].InstanceId' \
           --output text)
 
