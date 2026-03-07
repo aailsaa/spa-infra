@@ -70,6 +70,10 @@ jobs:
       run: |
         echo "${{ secrets.EC2_PRIVATE_KEY }}" > ec2-key.pem
         chmod 400 ec2-key.pem
+        export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+        export DB_URL=${{ secrets.DB_URL }}
+        export DB_USER=${{ secrets.DB_USER }}
+        export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
 
     # Transfer images
     - name: Run containers on EC2
@@ -79,16 +83,18 @@ jobs:
 
         scp -i ec2-key.pem -o StrictHostKeyChecking=no backend.tar.gz ec2-user@$EC2_IP:~
         scp -i ec2-key.pem -o StrictHostKeyChecking=no frontend.tar.gz ec2-user@$EC2_IP:~
+        scp -i ec2-key.pem -o StrictHostKeyChecking=no docker-compose.yml ec2-user@$EC2_IP:~
 
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
+
         gunzip backend.tar.gz
         gunzip frontend.tar.gz
 
         docker load < backend.tar
         docker load < frontend.tar
 
-        docker run -d -p 8080:8080 spa-backend
-        docker run -d -p 3000:3000 spa-frontend
+        docker compose up -d
+
         EOF
 
     # Smoke test
