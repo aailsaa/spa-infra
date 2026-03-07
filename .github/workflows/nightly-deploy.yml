@@ -70,10 +70,6 @@ jobs:
       run: |
         echo "${{ secrets.EC2_PRIVATE_KEY }}" > ec2-key.pem
         chmod 400 ec2-key.pem
-        export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-        export DB_URL=${{ secrets.DB_URL }}
-        export DB_USER=${{ secrets.DB_USER }}
-        export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
 
    # Wait for EC2
     - name: Wait for EC2 Initialization
@@ -100,7 +96,11 @@ jobs:
         
         scp -i ec2-key.pem -o StrictHostKeyChecking=no spa-app/docker-compose.deploy.yml ec2-user@$EC2_IP:docker-compose.yml
 
-        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
+        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << EOF
+        export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+        export DB_URL=${{ secrets.DB_URL }}
+        export DB_USER=${{ secrets.DB_USER }}
+        export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
 
         sudo docker-compose up -d
 
