@@ -82,7 +82,7 @@ jobs:
         echo "Waiting for EC2..."
 
         for i in {1..30}; do
-          if ssh -i ec2-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo connected"; then
+          if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo connected"; then
             echo "EC2 is ready"
             break
           fi
@@ -90,18 +90,18 @@ jobs:
           sleep 10
         done
         
-        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP \
+        ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP \
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo waiting...; sleep 5; done"
 
     # Transfer images
     - name: Run containers on EC2
       run: |
-        docker save spa-backend | ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP "sudo docker load"
-        docker save spa-frontend | ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP "sudo docker load"
+        docker save spa-backend | ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP "sudo docker load"
+        docker save spa-frontend | ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP "sudo docker load"
         
-        scp -i ec2-key.pem -o StrictHostKeyChecking=no spa-app/docker-compose.deploy.yml ec2-user@$EC2_IP:docker-compose.yml
+        scp -o StrictHostKeyChecking=no spa-app/docker-compose.deploy.yml ec2-user@$EC2_IP:docker-compose.yml
 
-        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << EOF
+        ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << EOF
 
         cat <<ENV > .env
         MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
