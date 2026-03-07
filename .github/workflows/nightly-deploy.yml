@@ -8,8 +8,8 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ECR_REPO: ${{ secrets.ECR_REPO }}
-  EC2_SECURITY_GROUP: ${{ secrets.EC2_SECURITY_GROUP }}
-  EC2_SUBNET: ${{ secrets.EC2_SUBNET }}
+  SECURITY_GROUP_ID: ${{ secrets.EC2_SECURITY_GROUP }}
+  SUBNET_ID: ${{ secrets.EC2_SUBNET }}
   EC2_KEY_NAME: ${{ secrets.EC2_KEY_NAME }}
 
 jobs:
@@ -47,7 +47,7 @@ jobs:
     - name: Launch temporary EC2
       run: |
         INSTANCE_ID=$(aws ec2 run-instances \
-          --image-id ami-0c02fb55956c7d316 \
+          --image-id ${{ secrets.AMI_ID }} \
           --instance-type t2.micro \
           --security-group-ids $EC2_SECURITY_GROUP \
           --subnet-id $EC2_SUBNET \
