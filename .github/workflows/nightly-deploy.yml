@@ -78,8 +78,8 @@ jobs:
     # Transfer images
     - name: Run containers on EC2
       run: |
-        docker save spa-backend | ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP "docker load"
-        docker save spa-frontend | ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP "docker load"
+        docker save spa-backend | ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP "sudo docker load"
+        docker save spa-frontend | ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP "sudo docker load"
         
         scp -i ec2-key.pem -o StrictHostKeyChecking=no spa-app/docker-compose.deploy.yml ec2-user@$EC2_IP:docker-compose.yml
 
@@ -88,15 +88,15 @@ jobs:
         gunzip backend.tar.gz
         gunzip frontend.tar.gz
 
-        docker load < backend.tar
-        docker load < frontend.tar
+        sudo docker load < backend.tar
+        sudo docker load < frontend.tar
 
-        docker-compose up -d
+        sudo docker-compose up -d
 
-        docker ps
-        docker images
-        docker-compose ps
-        docker-compose logs --tail=50
+        sudo docker ps
+        sudo docker images
+        sudo docker-compose ps
+        sudo docker-compose logs --tail=50
         curl localhost:8080 || echo "Backend not responding yet"
 
         EOF
