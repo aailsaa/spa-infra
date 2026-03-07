@@ -123,16 +123,17 @@ jobs:
       run: |
         echo "Waiting for backend..."
 
-        for i in {1..20}; do
-          if curl -s http://$EC2_IP:8080 > /dev/null; then
+        for i in {1..30}; do
+          if curl --fail -s http://$EC2_IP:8080/actuator/health > /dev/null; then
             echo "Backend is up!"
-            break
+            exit 0
           fi
           echo "Waiting..."
           sleep 5
         done
 
-        curl http://$EC2_IP:8080
+        echo "Backend failed to start"
+        exit 1
 
     # Terminate temp EC2
     - name: Terminate temporary EC2
