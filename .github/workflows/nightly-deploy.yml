@@ -99,20 +99,22 @@ jobs:
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << EOF
 
         cat <<ENV > .env
-        export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-        export DB_URL=${{ secrets.DB_URL }}
-        export DB_USER=${{ secrets.DB_USER }}
-        export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+        MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+        DB_URL=${{ secrets.DB_URL }}
+        DB_USER=${{ secrets.DB_USER }}
+        DB_PASSWORD=${{ secrets.DB_PASSWORD }}
         ENV
+
+        cat .env
 
         sudo docker-compose up -d
 
         sudo docker ps
         sudo docker images
 
-        sudo docker compose ps
-        sudo docker compose logs --tail=50
-        sudo docker compose logs backend
+        sudo docker logs ec2-user-backend-1 --tail 50
+        sudo docker logs ec2-user-frontend-1 --tail 50
+        sudo docker logs ec2-user-mysql-1 --tail 50
 
         EOF
 
