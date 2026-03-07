@@ -15,7 +15,7 @@ for i in {1..30}; do
     --connect-timeout 5 \
     --max-time 5 \
     -w "%{http_code}" \
-    http://localhost:8080/actuator/health)
+     http://$EC2_IP:5000/actuator/health)
 
   echo "Attempt $i → HTTP $STATUS"
 
