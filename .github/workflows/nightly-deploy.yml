@@ -121,30 +121,7 @@ jobs:
    
     - name: Smoke test
       run: |
-        ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
-
-        echo "Waiting for backend..."
-
-        for i in {1..30}; do
-          STATUS=$(curl -s -o /dev/null \
-            --connect-timeout 5 \
-            --max-time 5 \
-            -w "%{http_code}" \
-            http://localhost:8080/actuator/health)
-    
-          echo "Attempt $i → HTTP $STATUS"
-    
-          if [ "$STATUS" = "200" ]; then
-            echo "Backend is up!"
-            exit 0
-          fi
-          sleep 5
-        done
-
-        echo "Backend failed to start"
-        exit 1
-
-        EOF
+        bash scripts/smoke-test.sh $EC2_IP
 
     # Terminate temp EC2
     - name: Terminate temporary EC2
