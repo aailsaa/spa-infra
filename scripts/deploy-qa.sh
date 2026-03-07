@@ -7,7 +7,7 @@ ECR_REPO=$2
 
 echo "Deploying SPA to QA EC2: $QA_SERVER"
 
-ssh -T -o StrictHostKeyChecking=no ec2-user@$QA_SERVER << EOF
+ssh -vvv -T -o StrictHostKeyChecking=no ec2-user@$QA_SERVER << EOF
 
 echo "Pulling latest images from ECR..."
 
