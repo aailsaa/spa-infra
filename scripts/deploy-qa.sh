@@ -39,7 +39,7 @@ echo "Starting frontend..."
 
 docker run -d \
 -p 80:80 \
---name frontend \ 
+--name frontend \
 $ECR_REPO:frontend
 
 echo "QA deployment complete."
