@@ -82,7 +82,7 @@ jobs:
 
         for i in {1..30}; do
           if ssh -i ec2-key.pem -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo connected"; then
-            echo "EC2 is ready"
+            echo "EC2 SSH is ready"
             break
           fi
           echo "Waiting for SSH..."
