@@ -2,7 +2,9 @@
 
 set -e
 
-echo "Deploying to QA EC2..."
+QA_SERVER=$1
+
+echo "Deploying to QA EC2: $QA_SERVER"
 
 ssh -o StrictHostKeyChecking=no ec2-user@$QA_SERVER << EOF
 
