@@ -1,7 +1,5 @@
 #!/bin/bash
 
-EC2_IP=$1
-
 echo "Running smoke test on EC2..."
 
 ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
