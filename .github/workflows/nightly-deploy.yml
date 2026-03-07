@@ -48,7 +48,7 @@ jobs:
           --subnet-id $EC2_SUBNET \
           --associate-public-ip-address \
           --key-name $EC2_KEY_NAME \
-          --user-data file://scripts/userdata.sh
+          --user-data file://scripts/userdata.sh \
           --query 'Instances[0].InstanceId' \
           --output text)
 
@@ -65,30 +65,37 @@ jobs:
 
         echo "Temporary EC2 IP: $EC2_IP"
 
+        echo "Waiting for EC2 initialization..."
+        sleep 60
+
    # Set up ssh 
     - name: Setup SSH key
       run: |
         echo "${{ secrets.EC2_PRIVATE_KEY }}" > ec2-key.pem
         chmod 400 ec2-key.pem
+        export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+        export DB_URL=${{ secrets.DB_URL }}
+        export DB_USER=${{ secrets.DB_USER }}
+        export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
 
     # Transfer images
     - name: Run containers on EC2
       run: |
-        docker save spa-backend | gzip > backend.tar.gz
-        docker save spa-frontend | gzip > frontend.tar.gz
-
-        scp -i ec2-key.pem -o StrictHostKeyChecking=no backend.tar.gz ec2-user@$EC2_IP:~
-        scp -i ec2-key.pem -o StrictHostKeyChecking=no frontend.tar.gz ec2-user@$EC2_IP:~
+        docker save spa-backend | ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP "sudo docker load"
+        docker save spa-frontend | ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP "sudo docker load"
+        
+        scp -i ec2-key.pem -o StrictHostKeyChecking=no spa-app/docker-compose.deploy.yml ec2-user@$EC2_IP:docker-compose.yml
 
         ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$EC2_IP << 'EOF'
-        gunzip backend.tar.gz
-        gunzip frontend.tar.gz
 
-        docker load < backend.tar
-        docker load < frontend.tar
+        sudo docker-compose up -d
 
-        docker run -d -p 8080:8080 spa-backend
-        docker run -d -p 3000:3000 spa-frontend
+        sudo docker ps
+        sudo docker images
+        sudo docker-compose ps
+        sudo docker-compose logs --tail=50
+        curl localhost:8080 || echo "Backend not responding yet"
+
         EOF
 
     # Smoke test
