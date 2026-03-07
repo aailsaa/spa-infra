@@ -138,5 +138,5 @@ jobs:
 
     # Deploy to QA
     - name: Deploy to QA EC2
-      run: |
-        bash scripts/deploy-qa.sh
+      run: | 
+        bash scripts/deploy-qa.sh ${{ secrets.QA_EC2_IP }}
