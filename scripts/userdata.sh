@@ -1,9 +1,10 @@
 #!/bin/bash -xe
 
-yum update -y
-
 # Install Docker
-amazon-linux-extras install docker -y
+echo "Installing Docker..."
+yum install -y docker
+
+echo "Installing Docker..."
 systemctl start docker
 systemctl enable docker
 usermod -aG docker ec2-user
@@ -13,7 +14,8 @@ curl -L https://github.com/docker/compose/releases/download/v2.27.0/docker-compo
 -o /usr/local/bin/docker-compose
 
 chmod +x /usr/local/bin/docker-compose
-
 ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
-sudo docker-compose --version
+docker --version
+docker-compose --version
+
