@@ -61,49 +61,31 @@ jobs:
           StrictHostKeyChecking no
         EOF
 
-   # Wait for EC2
-    - name: Wait for EC2 Initialization
+    # Wait for EC2 
+    - name: Wait for EC2 + Docker
       run: |
-       echo "Waiting for EC2 SSH..."
+        echo "Waiting for EC2 and Docker..."
 
-       for i in {1..60}; do
-         if ssh \
-           -o BatchMode=yes \
-           -o ConnectTimeout=3 \
-           -o StrictHostKeyChecking=no \
-           ec2-user@$EC2_IP "echo connected"; then
-
-           echo "SSH ready"
-           exit 0
-         fi
-
-         echo "Attempt $i: not ready yet"
-         sleep 3
-       done
-
-       echo "EC2 never became reachable"
-       exit 1
-
-    # wait for docker on ec2 instance
-    - name: Wait for Docker
-      run: |
-        echo "Waiting for Docker installation..."
-
-        ssh ec2-user@$EC2_IP '
-          while ! command -v docker >/dev/null 2>&1; do
-            echo "Docker not installed yet..."
-            sleep 5
-          done
-
-          echo "Docker installed"
-
-          while ! sudo docker info >/dev/null 2>&1; do
-            echo "Docker daemon not ready..."
-            sleep 5
-          done
-
-          echo "Docker is ready"
-         '
+        for i in {1..60}; do
+          if ssh \
+            -o BatchMode=yes \
+            -o ConnectTimeout=3 \
+            -o StrictHostKeyChecking=no \
+            ec2-user@$EC2_IP '
+              command -v docker >/dev/null 2>&1 &&
+              sudo docker info >/dev/null 2>&1
+            '; then
+    
+            echo "EC2 and Docker ready"
+            exit 0
+          fi
+    
+          echo "Attempt $i: not ready yet"
+          sleep 5
+        done
+    
+        echo "EC2 never became ready"
+        exit 1
 
     # Transfer images
     - name: Run containers on EC2
