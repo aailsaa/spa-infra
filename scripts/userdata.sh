@@ -3,7 +3,7 @@
 yum update -y
 
 # Install Docker
-yum install -y docker
+amazon-linux-extras install docker -y
 systemctl start docker
 systemctl enable docker
 usermod -aG docker ec2-user
