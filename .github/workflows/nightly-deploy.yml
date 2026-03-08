@@ -105,6 +105,27 @@ jobs:
        echo "EC2 never became reachable"
        exit 1
 
+    # wait for docker on ec2 instance
+    - name: Wait for Docker
+      run: |
+        echo "Waiting for Docker installation..."
+
+        ssh ec2-user@$EC2_IP '
+          while ! command -v docker >/dev/null 2>&1; do
+            echo "Docker not installed yet..."
+            sleep 5
+          done
+
+          echo "Docker installed"
+
+          while ! sudo docker info >/dev/null 2>&1; do
+            echo "Docker daemon not ready..."
+            sleep 5
+          done
+
+          echo "Docker is ready"
+         '
+
     # Transfer images
     - name: Run containers on EC2
       run: |
