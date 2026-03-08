@@ -116,7 +116,8 @@ jobs:
         sudo docker ps
         sudo docker images
 
-        sudo docker logs $(sudo docker ps -q --filter "name=backend") --tail 100
+        sudo docker logs ec2-user-backend-1 --tail 50
+        sudo docker logs ec2-user-frontend-1 --tail 50
         
         EOF
 
