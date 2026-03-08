@@ -1,4 +1,5 @@
-#!/bin/bash -xe
+#!/bin/bash 
+set -ex
 
 # Install Docker
 echo "Installing Docker..."
