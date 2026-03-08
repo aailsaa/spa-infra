@@ -80,7 +80,6 @@ jobs:
           IdentityFile ~/.ssh/id_rsa
           StrictHostKeyChecking no
         EOF
-        ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
 
    # Wait for EC2
     - name: Wait for EC2 Initialization
