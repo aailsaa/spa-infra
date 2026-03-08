@@ -1,13 +1,9 @@
 #!/bin/bash
-
 set -e
 
-QA_SERVER=$1
-ECR_REPO=$2
+echo "Deploying SPA to QA EC2: $QA_EC2_IP"
 
-echo "Deploying SPA to QA EC2: $QA_SERVER"
-
-ssh -vvv -T -o StrictHostKeyChecking=no ec2-user@$QA_SERVER << EOF
+ssh -vvv -T -o StrictHostKeyChecking=no ec2-user@$QA_EC2_IP << EOF
 
 aws ecr get-login-password --region us-east-1 \
 | docker login --username AWS --password-stdin $ECR_REPO
