@@ -92,6 +92,25 @@ jobs:
         ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP \
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo waiting...; sleep 5; done"
 
+    - name: Wait for Docker to be ready
+      run: |
+        echo "Waiting for Docker to be available..."
+
+        ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP '
+          until command -v docker >/dev/null 2>&1; do
+            echo "Docker not installed yet..."
+            sleep 5
+          done
+
+          echo "Docker installed, waiting for daemon..."
+          until sudo docker info >/dev/null 2>&1; do
+            echo "Docker daemon not ready..."
+            sleep 5
+         done
+
+         echo "Docker is ready"
+    
+
     # Transfer images
     - name: Run containers on EC2
       run: |
