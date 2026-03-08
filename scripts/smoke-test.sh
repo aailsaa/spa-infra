@@ -14,7 +14,7 @@ for i in $(seq 1 $MAX_ATTEMPTS); do
   echo "HTTP status: $STATUS"
 
   if [ "$STATUS" = "200" ]; then
-    echo "Smoke test passed ✅"
+    echo "Smoke test passed"
     cat response.txt
     exit 0
   fi
