@@ -16,7 +16,7 @@ INSTANCE_ID=$(aws ec2 run-instances \
 
 echo "INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
 
-aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+aws ec2 wait instance-status-ok --instance-ids $INSTANCE_ID
 
 EC2_IP=$(aws ec2 describe-instances \
   --instance-ids $INSTANCE_ID \
