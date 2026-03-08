@@ -31,7 +31,7 @@ docker run -d \
 -p 5000:8080 \
 --name backend \
 -e DB_URL="$DB_URL" \
--e DB_USERNAME="$DB_USERNAME" \
+-e DB_USER="$DB_USER" \
 -e DB_PASSWORD="$DB_PASSWORD" \
 $ECR_REPO:backend
 
