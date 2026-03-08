@@ -47,9 +47,6 @@ jobs:
         bash scripts/create-ec2.sh
       env:
         AMI_ID: ${{ secrets.AMI_ID }}
-        EC2_SECURITY_GROUP: $EC2_SECURITY_GROUP
-        EC2_SUBNET: $EC2_SUBNET
-        EC2_KEY_NAME: $EC2_KEY_NAME
 
    # Set up ssh 
     - name: Setup SSH key
