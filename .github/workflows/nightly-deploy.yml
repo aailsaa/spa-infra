@@ -75,6 +75,12 @@ jobs:
         echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
 
+        cat <<EOF >> ~/.ssh/config
+        Host *
+          IdentityFile ~/.ssh/id_rsa
+          StrictHostKeyChecking no
+        EOF
+
    # Wait for EC2
     - name: Wait for EC2 Initialization
       run: |
@@ -91,26 +97,6 @@ jobs:
         
         ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP \
         "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo waiting...; sleep 5; done"
-
-    - name: Wait for Docker to be ready
-      run: |
-        echo "Waiting for Docker to be available..."
-
-        ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP '
-          until command -v docker >/dev/null 2>&1; do
-            echo "Docker not installed yet..."
-            sleep 5
-          done
-
-          echo "Docker installed, waiting for daemon..."
-          until sudo docker info >/dev/null 2>&1; do
-            echo "Docker daemon not ready..."
-            sleep 5
-         done
-
-         echo "Docker is ready"
-        '
-    
 
     # Transfer images
     - name: Run containers on EC2
