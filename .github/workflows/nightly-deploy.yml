@@ -12,7 +12,7 @@ env:
   EC2_SUBNET: ${{ secrets.SUBNET_ID }}
   EC2_KEY_NAME: ${{ secrets.EC2_KEY_NAME }}
   DB_URL: ${{ secrets.DB_URL }}
-  DB_USERNAME: ${{ secrets.DB_USERNAME }}
+  DB_USER: ${{ secrets.DB_USER }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
 jobs:
