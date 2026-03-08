@@ -80,23 +80,30 @@ jobs:
           IdentityFile ~/.ssh/id_rsa
           StrictHostKeyChecking no
         EOF
+        ssh-keyscan -H $EC2_IP >> ~/.ssh/known_hosts
 
    # Wait for EC2
     - name: Wait for EC2 Initialization
       run: |
-        echo "Waiting for EC2..."
+       echo "Waiting for EC2 SSH..."
 
-        for i in {1..30}; do
-          if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 ec2-user@$EC2_IP "echo connected"; then
-            echo "EC2 is ready"
-            break
-          fi
-          echo "Waiting for SSH..."
-          sleep 10
-        done
-        
-        ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP \
-        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo waiting...; sleep 5; done"
+       for i in {1..60}; do
+         if ssh \
+           -o BatchMode=yes \
+           -o ConnectTimeout=3 \
+           -o StrictHostKeyChecking=no \
+           ec2-user@$EC2_IP "echo connected"; then
+
+           echo "SSH ready"
+           exit 0
+         fi
+
+         echo "Attempt $i: not ready yet"
+         sleep 3
+       done
+
+       echo "EC2 never became reachable"
+       exit 1
 
     # Transfer images
     - name: Run containers on EC2
