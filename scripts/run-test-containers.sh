@@ -2,13 +2,14 @@
 
 echo "Running containers on EC2..."
 
-docker save spa-backend | ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP "sudo docker load"
-docker save spa-frontend | ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP "sudo docker load"
-
-scp -o StrictHostKeyChecking=no spa-app/docker-compose.deploy.yml ec2-user@$EC2_IP:docker-compose.yml
+# Copy project files to EC2
+scp -r -o StrictHostKeyChecking=no spa-app ec2-user@$EC2_IP:~
 
 ssh -o StrictHostKeyChecking=no ec2-user@$EC2_IP << EOF
 
+cd ~/spa-app
+
+# Create environment file
 cat <<ENV > .env
 MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
 DB_URL=$DB_URL
@@ -16,14 +17,25 @@ DB_USER=$DB_USER
 DB_PASSWORD=$DB_PASSWORD
 ENV
 
+echo "Environment variables:"
 cat .env
 
-sudo docker-compose up -d
+echo "Building containers..."
+sudo docker compose build
 
+echo "Starting containers..."
+sudo docker compose up -d
+
+echo "Running containers:"
 sudo docker ps
+
+echo "Docker images:"
 sudo docker images
 
-sudo docker logs ec2-user-backend-1 --tail 50
-sudo docker logs ec2-user-frontend-1 --tail 50
+echo "Backend logs:"
+sudo docker logs backend --tail 50 || true
+
+echo "Frontend logs:"
+sudo docker logs frontend --tail 50 || true
 
 EOF
