@@ -62,29 +62,26 @@ jobs:
         EOF
 
     # Wait for EC2 
-    - name: Wait for EC2 + Docker
+    - name: Wait for EC2 
       run: |
-        echo "Waiting for EC2 and Docker..."
+       echo "Waiting for EC2 SSH..."
 
-        for i in {1..60}; do
-          if ssh \
-            -o BatchMode=yes \
-            -o ConnectTimeout=3 \
-            -o StrictHostKeyChecking=no \
-            ec2-user@$EC2_IP '
-              command -v docker >/dev/null 2>&1 &&
-              sudo docker info >/dev/null 2>&1
-            '; then
-    
-            echo "EC2 and Docker ready"
-            exit 0
-          fi
-    
+       for i in {1..60}; do
+         if ssh \
+           -o BatchMode=yes \
+           -o ConnectTimeout=3 \
+           -o StrictHostKeyChecking=no \
+           ec2-user@$EC2_IP "echo connected" >/dev/null 2>&1; then
+      
+           echo "EC2 is ready"
+           exit 0
+         fi
+      
           echo "Attempt $i: not ready yet"
           sleep 5
         done
-    
-        echo "EC2 never became ready"
+      
+        echo "EC2 never became reachable"
         exit 1
 
     # Transfer images
