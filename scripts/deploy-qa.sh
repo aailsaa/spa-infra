@@ -38,7 +38,7 @@ $ECR_REPO:backend
 echo "Starting frontend..."
 
 docker run -d \
--p 80:80 \
+-p 3000:80 \
 --name frontend \
 $ECR_REPO:frontend
 
