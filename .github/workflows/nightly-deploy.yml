@@ -36,6 +36,11 @@ jobs:
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: ${{ secrets.AWS_REGION }}
 
+    # Build images
+    - name: Build Docker images
+      run: |
+        bash scripts/build-image.sh
+
     # Launch temporary EC2
     - name: Launch temporary EC2
       run: |
@@ -100,11 +105,6 @@ jobs:
         if [ -n "$INSTANCE_ID" ]; then
           aws ec2 terminate-instances --instance-ids $INSTANCE_ID
         fi
-
-    # Build images
-    - name: Build Docker images
-      run: |
-        bash scripts/build-image.sh
 
     # Push images to ECR
     - name: Push images to ECR
